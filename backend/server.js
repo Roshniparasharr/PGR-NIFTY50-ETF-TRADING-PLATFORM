@@ -4,7 +4,7 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import NiftyData from './models/NiftyData.js';
-import niftyRoute from './routes/niftyRoute.js';  // Ensure this file exists
+import niftyRoute from './routes/adminRoute.js';  // Ensure this file exists
 import fs from 'fs';
 
 dotenv.config();
