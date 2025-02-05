@@ -12,7 +12,7 @@ export default function Tables() {
           <Table />
         </div> */}
         <div className="w-full mb-12 px-4">
-          <Table color="dark" />
+          <Table />
         </div>
       </div>
     </>

@@ -13,7 +13,7 @@ const Table = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/nifty-data');
+        const response = await axios.get('http://localhost:5000/api/niftydata');
         if (response.data && Array.isArray(response.data)) {
           const sortedData = response.data.sort((a, b) => new Date(b.fetchTime) - new Date(a.fetchTime));
           setNiftyData([sortedData[0]]);

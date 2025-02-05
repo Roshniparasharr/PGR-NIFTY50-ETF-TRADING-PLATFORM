@@ -84,6 +84,9 @@ export const fetchNifty50Data = async () => {
       throw new Error(`Unexpected response status: ${response.status}`);
     }
 
+    console.log("Fetched data:", response.data);
+
+
     const apiData = response.data;
     if (!apiData || !apiData.data || !Array.isArray(apiData.data)) {
       throw new Error('❌ Invalid response structure from NSE API');

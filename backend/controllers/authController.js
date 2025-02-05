@@ -1,7 +1,11 @@
 import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { fetchDataFromNSE } from '../scripts/dataService.js';  // Import the function from dataService
+import { checkDataExists } from '../scripts/dataService.js'; // Utility functions for Nifty data handling
 
+
+// User registration
 export const registerUser = async (req, res) => {
   const { name, email, password } = req.body;
   try {
@@ -17,6 +21,7 @@ export const registerUser = async (req, res) => {
   }
 };
 
+// User login
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
   try {
