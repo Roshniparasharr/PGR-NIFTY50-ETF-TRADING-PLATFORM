@@ -1,0 +1,11 @@
+// Import ag-Grid styles and mixins
+@import "../../../node_modules/@ag-grid-enterprise/set-filter/node_modules/@ag-grid-community/core/dist/styles/ag-grid.scss";
+@import "../../../node_modules/@ag-grid-enterprise/set-filter/node_modules/@ag-grid-community/core/dist/styles/ag-theme-material/sass/ag-theme-material-mixin";
+
+.ag-theme-custom {
+  @include ag-theme-material(
+    (
+                  // Row hover color
+    )
+  );
+}
