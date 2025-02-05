@@ -1,22 +1,22 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import ReactDOM from "react-dom/client";
 import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
 
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "assets/styles/tailwind.css";
 
 // layouts
-
 import Admin from "./layouts/Admin";
 import Auth from "./layouts/Auth.js";
 
 // views without layouts
-
 import Landing from "./views/user/Landing.js";
 import Profile from "./views/user/Profile.js";
 import Index from "./views/user/Index.js";
 
-ReactDOM.render(
+// Use createRoot instead of render
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(
   <BrowserRouter>
     <Switch>
       {/* add routes with layouts */}
@@ -29,6 +29,5 @@ ReactDOM.render(
       {/* add redirect for first page */}
       <Redirect from="*" to="/" />
     </Switch>
-  </BrowserRouter>,
-  document.getElementById("root")
+  </BrowserRouter>
 );

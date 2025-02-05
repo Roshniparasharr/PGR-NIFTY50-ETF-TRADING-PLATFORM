@@ -1,28 +1,32 @@
 import mongoose from 'mongoose';
 
-const niftySchema = new mongoose.Schema(
-  {
-    symbol: String,
-    open: Number,
-    dayHigh: Number, 
-    dayLow: Number,
-    lastPrice: Number,
-    previousClose: Number,
-    change: Number,
-    pChange: Number,
-    totalTradedVolume: Number,
-    totalTradedValue: Number,
-    lastUpdateTime: String,
-    yearHigh: Number, 
-    yearLow: Number, 
-    perChange365d: Number,
-    date365dAgo: Date,
-    date30dAgo: Date,
-    perChange30d: Number,
-  });
+const stockSchema = new mongoose.Schema({
+  symbol: String,
+  open: Number,
+  dayHigh: Number,
+  dayLow: Number,
+  lastPrice: Number,
+  previousClose: Number,
+  change: Number,
+  pChange: Number,
+  totalTradedVolume: Number,
+  totalTradedValue: Number,
+  lastUpdateTime: String,
+  yearHigh: Number,
+  yearLow: Number,
+  perChange365d: Number,
+  date365dAgo: String,
+  date30dAgo: String,
+  perChange30d: Number,
+  timestamp: String,
+});
 
-// Fix in niftydata.js
-const NiftyData = mongoose.model('NiftyData', niftySchema, 'niftydatas');
+const batchSchema = new mongoose.Schema({
+  fetchTime: { type: Date, default: Date.now },
+  stocks: [stockSchema],
+});
 
+const NiftyData = mongoose.model('NiftyData', batchSchema);
+
+// ✅ Use default export
 export default NiftyData;
-

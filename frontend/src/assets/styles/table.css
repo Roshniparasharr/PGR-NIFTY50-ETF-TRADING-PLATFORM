@@ -1,0 +1,25 @@
+* Custom Scrollbar Styling */
+.ag-theme-alpine .ag-body-viewport {
+  /* Custom scrollbar width */
+  scrollbar-width: thin;
+  scrollbar-color: #4caf50 #f1f1f1; /* Green color for the scrollbar and light background for track */
+}
+
+/* Webkit-based browsers */
+.ag-theme-alpine::-webkit-scrollbar {
+  width: 5px; /* Set scrollbar width */
+}
+
+.ag-theme-alpine::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Light background for track */
+}
+
+.ag-theme-alpine::-webkit-scrollbar-thumb {
+  background-color: #0c4a6e; /* Green color for scrollbar */
+  border-radius: 10px; /* Rounded corners */
+  border: 0.5px solid #f1f1f1; /* Add a border around the thumb */
+}
+
+.ag-theme-alpine::-webkit-scrollbar-thumb:hover {
+  background-color: #0c4a6e; /* Darker green on hover */
+}
