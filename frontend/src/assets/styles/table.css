@@ -1,25 +1,141 @@
-* Custom Scrollbar Styling */
-.ag-theme-alpine .ag-body-viewport {
-  /* Custom scrollbar width */
+/* Table Container */
+.table-container {
+  background-color: #0c4a6e;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  color: #fff;
+  position: sticky; /* Make the header sticky */
+  top: 0; /* Stick the header to the top */
+  z-index: 1000;
+}
+
+/* Table Header */
+.table-header h3 {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #fff;
+}
+
+/* Loading State */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+}
+
+.loading-spinner {
+  border: 4px solid #3b6e8f;
+  border-top: 4px solid #fff;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-container p {
+  margin-top: 10px;
+  font-size: 16px;
+  color: #fff;
+}
+
+/* Error State */
+.error-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+}
+
+.error-message {
+  font-size: 16px;
+  color: #ff6b6b;
+}
+
+/* No Data Message */
+.no-data-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  font-size: 16px;
+  color: #fff;
+}
+
+/* Custom ag-grid theme */
+.ag-theme-custom {
+  background-color: #0c4a6e;
+  color: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Header Styling */
+.ag-theme-custom .ag-header {
+  background-color: #203246;
+  color: #b5b5b5;
+  font-weight: 600;
+  border-bottom: 1px solid #3b6e8f;
+}
+
+.ag-theme-custom .ag-header-cell {
+  padding: 12px 20px;
+}
+
+.ag-theme-custom .ag-header-cell-label {
+  font-size: 14px;
+}
+
+/* Row Styling */
+.ag-theme-custom .ag-row {
+  background-color: #0c4a6e;
+  color: #c3c3c3;
+  border-bottom: 1px solid #3b6e8f;
+}
+
+.ag-theme-custom .ag-row:hover {
+  background-color: #1a5a7a;
+}
+
+/* Cell Styling */
+.ag-theme-custom .ag-cell {
+  padding: 12px 20px;
+  font-size: 14px;
+}
+
+/* Scrollbar Styling */
+.ag-body-vertical-scroll {
+  width: 8px;
+  background-color: transparent;
+}
+
+.ag-body-vertical-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.ag-body-vertical-scroll::-webkit-scrollbar-thumb {
+  background-color: #3b6e8f;
+  border-radius: 10px;
+}
+
+.ag-body-vertical-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: #577f99;
+}
+
+.ag-body-vertical-scroll::-webkit-scrollbar-track {
+  background-color: #2c3e50;
+  border-radius: 10px;
+}
+
+.ag-body-vertical-scroll {
   scrollbar-width: thin;
-  scrollbar-color: #4caf50 #f1f1f1; /* Green color for the scrollbar and light background for track */
-}
-
-/* Webkit-based browsers */
-.ag-theme-alpine::-webkit-scrollbar {
-  width: 5px; /* Set scrollbar width */
-}
-
-.ag-theme-alpine::-webkit-scrollbar-track {
-  background: #f1f1f1; /* Light background for track */
-}
-
-.ag-theme-alpine::-webkit-scrollbar-thumb {
-  background-color: #0c4a6e; /* Green color for scrollbar */
-  border-radius: 10px; /* Rounded corners */
-  border: 0.5px solid #f1f1f1; /* Add a border around the thumb */
-}
-
-.ag-theme-alpine::-webkit-scrollbar-thumb:hover {
-  background-color: #0c4a6e; /* Darker green on hover */
+  scrollbar-color: #3b6e8f #2c3e50;
 }

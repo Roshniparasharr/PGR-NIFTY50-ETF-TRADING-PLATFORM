@@ -26,13 +26,13 @@ router.get('/api/refresh-data', async (req, res) => {
 //   const scraperPath = path.join(__dirname, 'scripts', 'scraper.js'); // Correct path to scraper.js
   
 //   // Execute scraper.js
-//   exec(node ${scraperPath}, (error, stdout, stderr) => {
+//   exec(`node ${scraperPath}`, (error, stdout, stderr) => {
 //     if (error) {
-//       console.error(exec error: ${error});
+//       console.error(`exec error: ${error}`);
 //       return res.status(500).json({ message: 'Error executing scraper' });
 //     }
-//     console.log(stdout: ${stdout});
-//     console.error(stderr: ${stderr});
+//     console.log(`stdout: ${stdout}`);
+//     console.error(`stderr: ${stderr}`);
 //     res.json({ message: 'Scraper executed successfully', data: stdout }); // You can send data if needed
 //   });
 // });
