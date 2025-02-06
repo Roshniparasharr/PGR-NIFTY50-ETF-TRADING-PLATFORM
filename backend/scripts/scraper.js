@@ -40,14 +40,20 @@ const saveNiftyDataToDB = async (formattedData) => {
 };
 
 const isDataDifferent = (oldStock, newStock) => {
+  // Keys included in the comparison
   const keysToCheck = [
     'symbol', 'open', 'dayHigh', 'dayLow', 'lastPrice', 'previousClose', 
     'change', 'pChange', 'totalTradedVolume', 'totalTradedValue', 
-    'lastUpdateTime', 'yearHigh', 'yearLow', 'date365dAgo'
+    'lastUpdateTime', 'yearHigh', 'yearLow'
   ];
-  
+
+  // Keys explicitly NOT included in the comparison
+  const excludedKeys = [
+    'perChange365d', 'date365dAgo', 'date30dAgo', 'perChange30d', 'timestamp'
+  ];
+
   let differences = {};
-  
+
   keysToCheck.forEach((key) => {
     if (oldStock[key] !== newStock[key]) {
       differences[key] = { old: oldStock[key], new: newStock[key] };
@@ -56,6 +62,7 @@ const isDataDifferent = (oldStock, newStock) => {
 
   return Object.keys(differences).length > 0 ? differences : null;
 };
+
 
 
 
@@ -84,7 +91,7 @@ export const fetchNifty50Data = async () => {
       throw new Error(`Unexpected response status: ${response.status}`);
     }
 
-    console.log("Fetched data:", response.data);
+    // console.log("Fetched data:", response.data);
 
 
     const apiData = response.data;
@@ -148,12 +155,12 @@ export const fetchNifty50Data = async () => {
   }
 };
 
-export const startAutoFetch = (interval = 15000) => { // 5 minutes = 300000 ms
+export const startAutoFetch = (interval) => { // 5 minutes = 300000 ms
   console.log(`Starting auto-fetch every ${interval / 1000 / 60} minutes...`);
   setInterval(() => {
     fetchNifty50Data().catch(err => console.error('❌ Error during auto-fetch:', err));
   }, interval);
 };
 
-fetchNifty50Data(); // Run only once initially
 
+startAutoFetch(20000);

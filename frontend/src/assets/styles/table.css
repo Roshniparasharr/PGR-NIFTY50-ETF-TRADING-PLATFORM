@@ -5,137 +5,158 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   padding: 20px;
   color: #fff;
-  position: sticky; /* Make the header sticky */
-  top: 0; /* Stick the header to the top */
-  z-index: 1000;
+  position: relative;
+  width: 100%;
+  height: 600px; /* Set fixed height */
+  overflow: hidden; /* Ensures no overflow */
 }
 
-/* Table Header */
-.table-header h3 {
-  font-size: 24px;
-  font-weight: 600;
-  margin-bottom: 20px;
-  color: #fff;
-}
-
-/* Loading State */
-.loading-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 300px;
-}
-
-.loading-spinner {
-  border: 4px solid #3b6e8f;
-  border-top: 4px solid #fff;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.loading-container p {
-  margin-top: 10px;
-  font-size: 16px;
-  color: #fff;
-}
-
-/* Error State */
-.error-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 300px;
-}
-
-.error-message {
-  font-size: 16px;
-  color: #ff6b6b;
-}
-
-/* No Data Message */
-.no-data-message {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 300px;
-  font-size: 16px;
-  color: #fff;
-}
-
-/* Custom ag-grid theme */
+/* Custom Scrollbar */
+/* Custom Scrollbar Styling */
 .ag-theme-custom {
-  background-color: #0c4a6e;
-  color: #fff;
-  border-radius: 8px;
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: 475px;
+  width: 100%;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+/* Styling the scrollbar track */
+.ag-theme-custom::-webkit-scrollbar {
+  width: 5px; 
+  height: 5px; 
+}
+
+/* Styling the scrollbar thumb */
+.ag-theme-custom::-webkit-scrollbar-thumb {
+  background-color: #3b6d8f8e; /* Light blue color */
+  border-radius: 10px; /* Rounded corners */
+  border: 1px solid #3b6d8f8e; /* Slight border to make the thumb stand out */
+  transition: background-color 0.3s;
+}
+
+/* Hover effect on scrollbar thumb */
+.ag-theme-custom::-webkit-scrollbar-thumb:hover {
+  background-color: #93c5fd; /* Lighter blue on hover */
+}
+
+/* Styling the scrollbar track (background area) */
+.ag-theme-custom::-webkit-scrollbar-track {
+  background-color: #0c4a6e; /* Dark background for the track */
+  border-radius: 10px; /* Rounded corners */
+}
+
+/* Custom scrollbars for vertical and horizontal separately */
+.ag-theme-custom::-webkit-scrollbar:horizontal {
+  height: 3px; /* Thinner horizontal scrollbar */
+}
+
+.ag-theme-custom::-webkit-scrollbar:vertical {
+  width: 3px; /* Thinner vertical scrollbar */
+}
+
+
+/* Table Layout */
+.ag-theme-custom table {
+  width: 100%;
+  border-collapse: separate;
+  table-layout: fixed; /* Forces columns to have fixed width */
+  min-height: 400px;
+  max-height: 400px;
+  /* overflow-y: auto;  
+   overflow-x: auto;    */
+}
+
+/* Column Widths */
+.ag-theme-custom th,
+.ag-theme-custom td {
+  width: 150px;
   overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  padding: 18px 20px; /* Increased padding for larger cells */
+  text-align: left;
+}
+
+/* Sticky First Column */
+.ag-theme-custom th:first-child,
+.ag-theme-custom td:first-child {
+  position: sticky;
+  left: 0;
+  background-color: #203246;
+  z-index: 2;
+}
+
+.ag-theme-custom td:not(:first-child) {
+  background-color: #20324642; /* Light gray background for other cells */
 }
 
 /* Header Styling */
-.ag-theme-custom .ag-header {
+.ag-theme-custom thead tr {
+  position: sticky;
+  top: 0;
   background-color: #203246;
-  color: #b5b5b5;
+  z-index: 3;
+}
+
+.ag-theme-custom th {
+  background-color: #203246;
+  color: #fff;
   font-weight: 600;
-  border-bottom: 1px solid #3b6e8f;
-}
-
-.ag-theme-custom .ag-header-cell {
-  padding: 12px 20px;
-}
-
-.ag-theme-custom .ag-header-cell-label {
+  text-transform: uppercase;
   font-size: 14px;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid #3b6e8f;
+  transition: background-color 0.2s;
+}
+
+.ag-theme-custom th:hover {
+  background-color: #2a4257;
+  cursor: pointer;
 }
 
 /* Row Styling */
-.ag-theme-custom .ag-row {
-  background-color: #0c4a6e;
-  color: #c3c3c3;
-  border-bottom: 1px solid #3b6e8f;
+.ag-theme-custom tbody tr:nth-child(even) {
+  background-color: #0d5580;
 }
 
-.ag-theme-custom .ag-row:hover {
+.ag-theme-custom tbody tr:hover {
   background-color: #1a5a7a;
 }
 
 /* Cell Styling */
-.ag-theme-custom .ag-cell {
-  padding: 12px 20px;
+.ag-theme-custom td {
+  color: #e5e5e5;
   font-size: 14px;
+  border-bottom: 1px solid #3b6e8f;
 }
 
-/* Scrollbar Styling */
-.ag-body-vertical-scroll {
-  width: 8px;
-  background-color: transparent;
+/* Link Styling */
+.ag-theme-custom a {
+  color: #60a5fa;
+  text-decoration: none;
+  transition: color 0.2s;
 }
 
-.ag-body-vertical-scroll::-webkit-scrollbar {
-  width: 8px;
+.ag-theme-custom a:hover {
+  color: #93c5fd;
 }
 
-.ag-body-vertical-scroll::-webkit-scrollbar-thumb {
-  background-color: #3b6e8f;
-  border-radius: 10px;
+
+/* Header Styling */
+.table-header {
+  font-size: 24px; /* Adjust the font size */
+  font-weight: 700; /* Bold text */
+  color: #ffffff; /* White color for text */
+  text-align: center; /* Center align the text */
+  margin-bottom: 10px; /* Spacing below the header */
+  padding: 8px 0; /* Padding on top and bottom */
+  text-transform: uppercase; /* Uppercase for a strong look */
+  letter-spacing: 2px; /* Slight letter spacing for readability */
+  background-color: #203246; /* Dark background color */
+  border-radius: 8px; /* Rounded corners for a soft look */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
 }
 
-.ag-body-vertical-scroll::-webkit-scrollbar-thumb:hover {
-  background-color: #577f99;
-}
-
-.ag-body-vertical-scroll::-webkit-scrollbar-track {
-  background-color: #2c3e50;
-  border-radius: 10px;
-}
-
-.ag-body-vertical-scroll {
-  scrollbar-width: thin;
-  scrollbar-color: #3b6e8f #2c3e50;
-}

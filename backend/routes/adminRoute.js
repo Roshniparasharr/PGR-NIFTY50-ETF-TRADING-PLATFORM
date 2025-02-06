@@ -1,42 +1,7 @@
 import express from 'express';
+import NiftyData from '../models/NiftyData.js';  // Import the NiftyData model
+
 const router = express.Router();
-import { fetchDataFromNSE } from '../scripts/dataService.js';  // Import the function from dataService
-import { checkDataExists } from '../scripts/dataService.js';
-
-router.get('/api/refresh-data', async (req, res) => {
-  try {
-    const currentDate = new Date().toISOString().split('T')[0];  // Get the current date in YYYY-MM-DD format
-
-    // Check if data for today already exists in the database
-    const dataExists = await checkDataExists(currentDate);
-
-    if (dataExists) {
-      return res.json({ status: 'already_exists' });  // Data already exists, no need to fetch
-    }
-
-    // If data doesn't exist, trigger the scraper to fetch fresh data
-    await fetchDataFromNSE();
-    return res.json({ status: 'fetched' });  // Data fetched and stored successfully
-  } catch (error) {
-    console.error('Error while handling refresh:', error);
-    return res.status(500).json({ status: 'error', message: 'An error occurred' });
-  }
-});
-// router.get('/scraper', (req, res) => {
-//   const scraperPath = path.join(__dirname, 'scripts', 'scraper.js'); // Correct path to scraper.js
-  
-//   // Execute scraper.js
-//   exec(`node ${scraperPath}`, (error, stdout, stderr) => {
-//     if (error) {
-//       console.error(`exec error: ${error}`);
-//       return res.status(500).json({ message: 'Error executing scraper' });
-//     }
-//     console.log(`stdout: ${stdout}`);
-//     console.error(`stderr: ${stderr}`);
-//     res.json({ message: 'Scraper executed successfully', data: stdout }); // You can send data if needed
-//   });
-// });
-
 
 // Endpoint to save data to MongoDB
 router.post('/', async (req, res) => {
@@ -49,5 +14,24 @@ router.post('/', async (req, res) => {
     res.status(500).json({ error: 'Failed to save data to the database.' });
   }
 });
+
+// New endpoint to fetch company details by symbol
+// router.get('/company/:symbol', async (req, res) => {
+//   try {
+//     const { symbol } = req.params;
+//     const companyData = await NiftyData.findOne({ 'stocks.symbol': symbol });
+
+//     if (!companyData) {
+//       return res.status(404).json({ message: 'Company not found' });
+//     }
+
+//     // Find the company in the stocks array
+//     const companyDetails = companyData.stocks.find(stock => stock.symbol === symbol);
+
+//     res.json(companyDetails);
+//   } catch (error) {
+//     res.status(500).json({ message: 'Error fetching company data' });
+//   }
+// });
 
 export default router;

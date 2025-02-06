@@ -17,7 +17,15 @@ export default function Login() {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
+    // Hardcoded Admin Login
+    if (formData.email === "admin@example.com" && formData.password === "admin") {
+      setMessage("Admin login successful!");
+      localStorage.setItem("token", "admin-token"); // Store a fake token for admin
+      history.push("/admin"); // Redirect to admin dashboard
+      return;
+    }
+
     try {
       const response = await fetch("http://localhost:5000/api/auth/login", {
         method: "POST",

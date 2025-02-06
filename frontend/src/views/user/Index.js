@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import IndexNavbar from "../../components/User/Navbars/IndexNavbar.js";
 import Footer from "../../components/User/Footers/Footer.js";
-import Table from "../../components/User/Cards/CardTable.js"; // Import is correct
+import { Link } from "react-router-dom";
 
 export default function Index() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -15,28 +15,45 @@ export default function Index() {
   return (
     <>
       <IndexNavbar fixed />
-      <section className="header relative pt-16 flex h-screen max-h-screen overflow-auto">
-        <div className="container mx-auto items-center flex flex-wrap">
-          <div className="w-full px-4">
-            <div className="pt-32 sm:pt-0 text-center">
-              <h2 className="font-semibold text-4xl text-blueGray-600">
-                Nifty Market Updates
-              </h2>
-              {/* Show the Table only if the user is logged in */}
-              {isAuthenticated ? (
-                <div className="mt-8">
-                  <Table color="light" />
-                </div>
-              ) : (
-                <p className="text-red-500 text-lg mt-4">
-                  Please log in to view Nifty Data.
-                </p>
-              )}
+
+      {/* Homepage Section with Text on Left and Image on Right */}
+      <section className="relative pt-32 lg:pt-16 flex h-screen max-h-screen overflow-auto">
+        <div className="container mx-auto flex flex-wrap items-center justify-between px-6">
+          {/* Left Section: Text */}
+          <div className="w-full md:w-1/2 text-left">
+            <h1 className="text-3xl md:text-5xl font-bold text-black mb-4">
+              Track Stock Trends in Real Time
+            </h1>
+            <p className="text-lg md:text-xl text-gray-700 mb-8">
+              Stay updated with the latest stock market trends and data with StockSphere. 
+              Never miss a beat with our real-time updates.
+            </p>
+            <div className="flex gap-4">
+              <Link to="/learn">
+                <button className="bg-gray-300 text-black px-6 py-3 font-bold rounded-md text-sm md:text-lg">
+                  LEARN MORE
+                </button>
+              </Link>
+              <Link to="/crypto-tracker">
+                <button className="border border-gray-500 text-gray-100 px-6 py-3 font-bold rounded-md text-sm md:text-lg">
+                  CRYPTO TRACKER
+                </button>
+              </Link>
             </div>
+          </div>
+
+          {/* Right Section: Image */}
+          <div className="w-50 md:w-1/2 mt-12 md:mt-0">
+            <img
+              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCF1RGFSZVgHxCRTjizHzDzpqDNny80uff-A&s" // Replace with a relevant stock market image
+              alt="Stock Market"
+              className="w-full h-auto object-cover rounded-lg"
+            />
           </div>
         </div>
       </section>
-     
+
+      <Footer />
     </>
   );
 }

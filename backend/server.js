@@ -1,42 +1,19 @@
 import express from 'express';
-import mongoose from 'mongoose';
 import cors from 'cors';
-import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import NiftyData from './models/NiftyData.js';
 import niftyRoute from './routes/adminRoute.js';  // Ensure this file exists
-import fs from 'fs';
 import connectDB from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
-dotenv.config();
 
+dotenv.config();
 const app = express();
 connectDB();
 
 app.use(cors());
 app.use(express.json());
 app.use("/api/auth", authRoutes);
-
-// Fetch and save Nifty data
-async function readAndSaveNiftyData() {
-  try {
-    // Read the JSON file
-    const data = fs.readFileSync('./scripts/nifty50Data.json', 'utf8');
-    const parsedData = JSON.parse(data);
-
-    // Check if the data exists
-    if (parsedData.length === 0) {
-      console.log('No data to insert!');
-      return;
-    }
-
-    // Insert the data into the database
-    await NiftyData.insertMany(parsedData);
-    console.log('Data saved to database');
-  } catch (error) {
-    console.error('Error reading or saving data:', error);
-  }
-}
+app.use('/api/nifty', niftyRoute);
 
 // API endpoint to get Nifty data from MongoDB
 app.get('/api/niftydata', async (req, res) => {
@@ -48,13 +25,43 @@ app.get('/api/niftydata', async (req, res) => {
   }
 });
 
-
-// Use the Nifty route (if you have separate route file)
-app.use('/api/nifty', niftyRoute);
-
 // Server setup
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
-  await readAndSaveNiftyData();  // Ensure it runs when the server starts
 });
+
+ // Adjust the path as needed
+
+// Example route handler to get data for a specific company symbol
+app.get('/api/company/:symbol', async (req, res) => {
+  const { symbol } = req.params;
+
+  try {
+    // Find all batches containing the company symbol in the 'stocks' array
+    const batches = await NiftyData.find({
+      'stocks.symbol': symbol
+    });
+
+    // Extract the relevant stock data from each batch
+    const companyData = [];
+    batches.forEach(batch => {
+      batch.stocks.forEach(stock => {
+        if (stock.symbol === symbol) {
+          companyData.push(stock);  // Add the stock data of the company symbol to the result array
+        }
+      });
+    });
+
+    if (companyData.length === 0) {
+      return res.status(404).json({ message: 'No data found for the specified company' });
+    }
+
+    res.json(companyData);  // Send the collected data
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to fetch company data' });
+  }
+});
+
+

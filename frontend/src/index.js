@@ -1,33 +1,42 @@
 import React from "react";
-import ReactDOM from "react-dom/client";
+import ReactDOM from "react-dom";
 import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
 
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "assets/styles/tailwind.css";
 
-// layouts
+// Layouts
 import Admin from "./layouts/Admin";
 import Auth from "./layouts/Auth.js";
 
-// views without layouts
+// Views without layouts
 import Landing from "./views/user/Landing.js";
 import Profile from "./views/user/Profile.js";
 import Index from "./views/user/Index.js";
+import AboutHero from "components/User/About/AboutHero.js";
+import ContactPage from "components/User/Contact/ContactPage";
+import ServicesPage from "components/User/Service/ServicesPage";
 
-// Use createRoot instead of render
-const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(
+// Use ReactDOM.render instead of createRoot (since React 17 is likely being used)
+ReactDOM.render(
   <BrowserRouter>
     <Switch>
-      {/* add routes with layouts */}
+      {/* Routes with layouts */}
       <Route path="/admin" component={Admin} />
       <Route path="/auth" component={Auth} />
-      {/* add routes without layouts */}
+
+      {/* Routes without layouts */}
       <Route path="/landing" exact component={Landing} />
       <Route path="/profile" exact component={Profile} />
       <Route path="/" exact component={Index} />
-      {/* add redirect for first page */}
+      <Route path="/about" exact component={AboutHero} />
+      <Route path="/contact" exact component={ContactPage} />
+      <Route path="/services" exact component={ServicesPage} />
+
+
+      {/* Redirect for unknown routes */}
       <Redirect from="*" to="/" />
     </Switch>
-  </BrowserRouter>
+  </BrowserRouter>,
+  document.getElementById("root")
 );

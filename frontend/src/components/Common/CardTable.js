@@ -1,22 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { AgGridReact } from 'ag-grid-react';
-import { ClientSideRowModelModule } from 'ag-grid-community';
-import { MenuModule, ColumnsToolPanelModule } from 'ag-grid-enterprise';
+import { Link } from 'react-router-dom';
 import '../../assets/styles/table.css';
 
 const Table = () => {
   const [niftyData, setNiftyData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'none' });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get('http://localhost:5000/api/niftydata');
+        console.log('Fetched data:', response.data);
         if (response.data && Array.isArray(response.data)) {
           const sortedData = response.data.sort((a, b) => new Date(b.fetchTime) - new Date(a.fetchTime));
-          setNiftyData([sortedData[0]]);
+          setNiftyData([sortedData[0]]); // Only using the most recent data
         } else {
           setError('Invalid data format received');
         }
@@ -30,39 +30,30 @@ const Table = () => {
     fetchData();
   }, []);
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date instanceof Date && !isNaN(date)
-      ? date.toLocaleString('en-GB', {
-          day: '2-digit',
-          month: 'short',
-          year: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: true,
-        })
-      : 'Invalid Date';
+  const requestSort = (key) => {
+    let direction = 'ascending';
+    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+      direction = 'descending';
+    } else if (sortConfig.key === key && sortConfig.direction === 'descending') {
+      direction = 'none';
+    }
+    setSortConfig({ key, direction });
   };
 
-  const columnDefs = [
-    { headerName: "S No.", valueGetter: "node.rowIndex + 1", width: 100 },
-    { headerName: "Company", field: "symbol", sortable: true, filter: true, menuTabs: ['filterMenuTab', 'generalMenuTab'] },
-    { headerName: "Open", field: "open", cellClass: "numeric", sortable: true, filter: true, menuTabs: ['filterMenuTab', 'generalMenuTab'] },
-    { headerName: "Day High", field: "dayHigh", cellClass: "numeric", sortable: true, filter: true, menuTabs: ['filterMenuTab', 'generalMenuTab'] },
-    { headerName: "Day Low", field: "dayLow", cellClass: "numeric", sortable: true, filter: true, menuTabs: ['filterMenuTab', 'generalMenuTab'] },
-    { headerName: "Last Price", field: "lastPrice", cellClass: "numeric", sortable: true, filter: true, menuTabs: ['filterMenuTab', 'generalMenuTab'] },
-    { headerName: "Previous Close", field: "previousClose", cellClass: "numeric", sortable: true, filter: true, menuTabs: ['filterMenuTab', 'generalMenuTab'] },
-    { headerName: "Change", field: "change", cellClass: "numeric change-column", sortable: true, filter: true, menuTabs: ['filterMenuTab', 'generalMenuTab'] },
-    { headerName: "Volume", field: "totalTradedVolume", cellClass: "numeric", sortable: true, filter: true, menuTabs: ['filterMenuTab', 'generalMenuTab'] },
-    { headerName: "Value", field: "totalTradedValue", cellClass: "numeric", sortable: true, filter: true, menuTabs: ['filterMenuTab', 'generalMenuTab'] },
-    { headerName: "Last Update Time", field: "lastUpdateTime", valueFormatter: ({ value }) => formatDate(value), sortable: true, filter: true, menuTabs: ['filterMenuTab', 'generalMenuTab'] },
-    { headerName: "Year High", field: "yearHigh", cellClass: "numeric", sortable: true, filter: true, menuTabs: ['filterMenuTab', 'generalMenuTab'] },
-    { headerName: "Year Low", field: "yearLow", cellClass: "numeric", sortable: true, filter: true, menuTabs: ['filterMenuTab', 'generalMenuTab'] },
-    { headerName: "Per Change 365d", field: "perChange365d", cellClass: "numeric change-column", sortable: true, filter: true, menuTabs: ['filterMenuTab', 'generalMenuTab'] },
-    { headerName: "Date 365d Ago", field: "date365dAgo", valueFormatter: ({ value }) => formatDate(value), sortable: true, filter: true, menuTabs: ['filterMenuTab', 'generalMenuTab'] },
-    { headerName: "Date 30d Ago", field: "date30dAgo", valueFormatter: ({ value }) => formatDate(value), sortable: true, filter: true, menuTabs: ['filterMenuTab', 'generalMenuTab'] },
-    { headerName: "Per Change 30d", field: "perChange30d", cellClass: "numeric change-column", sortable: true, filter: true, menuTabs: ['filterMenuTab', 'generalMenuTab'] }
-  ];
+  const getSortedData = (data) => {
+    if (sortConfig.direction === 'none') {
+      return data;
+    }
+    return [...data].sort((a, b) => {
+      if (a[sortConfig.key] < b[sortConfig.key]) {
+        return sortConfig.direction === 'ascending' ? -1 : 1;
+      }
+      if (a[sortConfig.key] > b[sortConfig.key]) {
+        return sortConfig.direction === 'ascending' ? 1 : -1;
+      }
+      return 0;
+    });
+  };
 
   if (loading) {
     return (
@@ -83,29 +74,44 @@ const Table = () => {
 
   return (
     <div className="table-container">
-      <div className="table-header">
-        <h3>Nifty Data</h3>
-      </div>
-      <div className={`ag-theme-custom`} style={{ height: '500px', width: '100%' }}>
-        {niftyData.length === 0 ? (
-          <div className="no-data-message">No data available</div>
-        ) : (
-          <AgGridReact
-            modules={[ClientSideRowModelModule, MenuModule, ColumnsToolPanelModule]}
-            columnDefs={columnDefs}
-            rowData={niftyData.length > 0 && niftyData[0]?.stocks ? niftyData[0].stocks : []}
-            rowModelType="clientSide"
-            pinnedTopRowData={niftyData[0]?.stocks && niftyData[0].stocks.length > 0 ? [niftyData[0].stocks[0]] : []}
-            suppressHorizontalScroll={true}
-            headerHeight={50}
-            rowHeight={40}
-            popupParent={document.body}
-            suppressMenuHide={true}
-            defaultColDef={{
-              menuTabs: ['filterMenuTab', 'generalMenuTab'], // Enable filter and general menu tabs
-            }}
-          />
-        )}
+      <div className="py-8">
+        <div className="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto">
+          <h3 className="table-header">Nifty Data</h3>
+          <div className="ag-theme-custom">
+            <table className="ag-header">
+              <thead>
+                <tr>
+                  {['symbol', 'open', 'dayHigh', 'dayLow', 'previousClose', 'lastPrice', 'change', 'pChange', 'totalTradedVolume', 'totalTradedValue', 'yearHigh', 'yearLow', 'perChange365d', 'perChange30d'].map((column) => (
+                    <th
+                      key={column}
+                      className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer"
+                      onClick={() => requestSort(column)}
+                    >
+                      {column.replace(/([A-Z])/g, ' $1').toUpperCase()}
+                      {sortConfig.key === column && (sortConfig.direction === 'ascending' ? ' ▲' : sortConfig.direction === 'descending' ? ' ▼' : '')}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {niftyData[0]?.stocks && getSortedData(niftyData[0].stocks).map((row, index) => (
+                  <tr key={index} className="ag-header-cell">
+                    <td className="ag-row">
+                      <Link to={`/company/${row.symbol}`} className="text-blue-500 hover:text-blue-800">
+                        {row.symbol}
+                      </Link>
+                    </td>
+                    {['open', 'dayHigh', 'dayLow', 'previousClose', 'lastPrice', 'change', 'pChange', 'totalTradedVolume', 'totalTradedValue', 'yearHigh', 'yearLow', 'perChange365d', 'perChange30d'].map((field, index) => (
+                      <td key={index} className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        {row[field]}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
   );
