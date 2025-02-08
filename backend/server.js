@@ -5,18 +5,38 @@ import NiftyData from './models/NiftyData.js';
 import niftyRoute from './routes/adminRoute.js';  // Ensure this file exists
 import connectDB from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
+// import scrapeAndStoreETFData from './scripts/scraper2.js'
+import stockRoute from "./routes/stockRoute.js";
 import { fetchNifty50Data } from './scripts/scraper.js';
+
+// added by abhishek 
+import cron from 'node-cron';
+import { scrapeAndStoreETFData } from './controllers/stockController.js';
 
  // This will fetch and store Nifty data when the server starts
 
 dotenv.config();
 const app = express();
+
+
+
+cron.schedule('*/5 * * * * *', async () => {
+  try {
+    await scrapeAndStoreETFData();
+    console.log('ETF data scraped and saved successfully');
+  } catch (error) {
+    console.error('Error scraping ETF data:', error.message);
+  }
+});
+
 connectDB();
 
 app.use(cors());
 app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use('/api/nifty', niftyRoute);
+app.use('/api/data', stockRoute);
+
 
 // API endpoint to get Nifty data from MongoDB
 app.get('/api/niftydata', async (req, res) => {

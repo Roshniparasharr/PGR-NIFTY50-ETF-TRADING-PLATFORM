@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import '../../assets/styles/table.css';
 
-const Table = () => {
+const CardTable = () => {
   const [niftyData, setNiftyData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -13,7 +13,7 @@ const Table = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get('http://localhost:5000/api/niftydata');
-        console.log('Fetched data:', response.data);
+        // console.log('Fetched Nifty data:', response.data);
         if (response.data && Array.isArray(response.data)) {
           const sortedData = response.data.sort((a, b) => new Date(b.fetchTime) - new Date(a.fetchTime));
           setNiftyData([sortedData[0]]); // Only using the most recent data
@@ -21,12 +21,13 @@ const Table = () => {
           setError('Invalid data format received');
         }
       } catch (error) {
+        console.error('Error fetching Nifty data:', error);
         setError(`Error fetching data: ${error.message}`);
       } finally {
         setLoading(false);
       }
     };
-
+  
     fetchData();
   }, []);
 
@@ -117,4 +118,4 @@ const Table = () => {
   );
 };
 
-export default Table;
+export default CardTable;
