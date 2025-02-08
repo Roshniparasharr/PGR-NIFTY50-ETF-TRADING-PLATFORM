@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import IndexNavbar from "../../components/User/Navbars/IndexNavbar.js";
 import Footer from "../../components/User/Footers/Footer.js";
 import { Link } from "react-router-dom";
+import Stock from "../../assets/stock.jpg";
 
 export default function Index() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -21,7 +22,7 @@ export default function Index() {
         <div className="container mx-auto flex flex-wrap items-center justify-between px-6">
           {/* Left Section: Text */}
           <div className="w-full md:w-1/2 text-left">
-            <h1 className="text-3xl md:text-5xl font-bold text-black mb-4">
+            <h1 className="text-3xl md:text-5xl font-bold text-blueGray-800 mb-4">
               Track Stock Trends in Real Time
             </h1>
             <p className="text-lg md:text-xl text-gray-700 mb-8">
@@ -34,18 +35,14 @@ export default function Index() {
                   LEARN MORE
                 </button>
               </Link>
-              <Link to="/crypto-tracker">
-                <button className="border border-gray-500 text-gray-100 px-6 py-3 font-bold rounded-md text-sm md:text-lg">
-                  CRYPTO TRACKER
-                </button>
-              </Link>
+             
             </div>
           </div>
 
           {/* Right Section: Image */}
           <div className="w-50 md:w-1/2 mt-12 md:mt-0">
             <img
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCF1RGFSZVgHxCRTjizHzDzpqDNny80uff-A&s" // Replace with a relevant stock market image
+              src={Stock} // Replace with a relevant stock market image
               alt="Stock Market"
               className="w-full h-auto object-cover rounded-lg"
             />

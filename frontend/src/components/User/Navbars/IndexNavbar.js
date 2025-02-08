@@ -16,12 +16,13 @@ export default function Navbar() {
   const handleLogout = () => {
     localStorage.removeItem("token"); // Remove token
     setIsAuthenticated(false);
-    history.push("/auth/login"); // Redirect to home
+    history.push("/auth/login"); // Redirect to login page
   };
 
   return (
     <>
-      <nav className="top-0 fixed z-50 w-full flex flex-wrap items-center justify-between px-4 py-3 navbar-expand-lg bg-blue-900 shadow-lg bg-white">
+    
+      <nav className="top-0 fixed z-50 w-full flex flex-wrap items-center justify-between px-4 py-3 navbar-expand-lg shadow-lg bg-white">
         <div className="container px-4 mx-auto flex flex-wrap items-center justify-between">
           <div className="w-full relative flex justify-between lg:w-auto lg:static lg:block lg:justify-start">
             <Link
@@ -47,11 +48,11 @@ export default function Navbar() {
             id="navbar-links"
           >
             <ul className="flex flex-col lg:flex-row list-none lg:ml-auto space-x-6">
-              {/* New Navigation Links */}
+              {/* Navigation Links */}
               <li className="flex items-center">
                 <Link
                   to="/"
-                 className="hover:text-blueGray-500 text-blueGray-700 px-3 py-4 lg:py-2 flex items-center text-xs uppercase font-bold"
+                  className="hover:text-blueGray-500 text-blueGray-700 px-3 py-4 lg:py-2 flex items-center text-xs uppercase font-bold"
                 >
                   Home
                 </Link>
@@ -67,7 +68,7 @@ export default function Navbar() {
               <li className="flex items-center">
                 <Link
                   to="/contact"
-                className="hover:text-blueGray-500 text-blueGray-700 px-3 py-4 lg:py-2 flex items-center text-xs uppercase font-bold"
+                  className="hover:text-blueGray-500 text-blueGray-700 px-3 py-4 lg:py-2 flex items-center text-xs uppercase font-bold"
                 >
                   Contact
                 </Link>
@@ -75,21 +76,23 @@ export default function Navbar() {
               <li className="flex items-center">
                 <Link
                   to="/services"
-                 className="hover:text-blueGray-500 text-blueGray-700 px-3 py-4 lg:py-2 flex items-center text-xs uppercase font-bold"
+                  className="hover:text-blueGray-500 text-blueGray-700 px-3 py-4 lg:py-2 flex items-center text-xs uppercase font-bold"
                 >
                   Services
                 </Link>
               </li>
 
-              {/* <li className="flex items-center">
-                <IndexDropdown />
-              </li> */}
-
               {/* Conditional Rendering for Login, Register, and Logout */}
               {isAuthenticated ? (
                 <li className="flex items-center">
+                  {/* Profile Icon */}
+                  <Link to="/profile" className="text-gray-700 hover:text-blueGray-600 text-2xl mr-4">
+                    <i className="fas fa-user-circle"></i>
+                  </Link>
+
+                  {/* Added ml-4 for spacing between Profile Icon and Logout Button */}
                   <button
-                    className="bg-red-500 text-white active:bg-red-600 text-xs font-bold uppercase px-4 py-2 rounded shadow hover:shadow-lg outline-none focus:outline-none lg:mr-1 lg:mb-0 ml-3 mb-3 ease-linear transition-all duration-150"
+                    className="bg-red-500 text-white active:bg-red-600 text-xs font-bold uppercase px-4 py-2 rounded shadow hover:shadow-lg outline-none focus:outline-none ease-linear transition-all duration-150"
                     type="button"
                     onClick={handleLogout}
                   >
@@ -100,16 +103,19 @@ export default function Navbar() {
                 <>
                   <li className="flex items-center">
                     <Link
-                      to="/auth/login" // Updated path
-                      className="bg-lightBlue-500 text-white active:bg-lightBlue-600 text-xs font-bold uppercase px-4 py-2 rounded shadow hover:shadow-lg outline-none focus:outline-none lg:mr-1 lg:mb-0 ml-3 mb-3 ease-linear transition-all duration-150"
+                      to="/auth/login"
+                      className="bg-lightBlue-500 text-white text-xs font-bold uppercase px-4 py-2 rounded shadow 
+                       hover:bg-blueGray-800 active:bg-blue-900 focus:bg-blue-900 
+                       hover:shadow-lg outline-none focus:outline-none ease-linear transition-all duration-150"
                     >
                       <i className="fas fa-sign-in-alt"></i> Login
                     </Link>
                   </li>
+
                   <li className="flex items-center">
                     <Link
                       to="/auth/register"
-                      className="bg-red-500 text-white active:bg-green-600 text-xs font-bold uppercase px-4 py-2 rounded shadow hover:bg-green-700 hover:shadow-lg outline-none focus:outline-none lg:mr-1 lg:mb-0 ml-3 mb-3 ease-linear transition-all duration-150"
+                      className="bg-red-500 text-white active:bg-green-600 text-xs font-bold uppercase px-4 py-2 rounded shadow hover:bg-green-700 hover:shadow-lg outline-none focus:outline-none ease-linear transition-all duration-150"
                     >
                       <i className="fas fa-user-plus mr-1"></i> Register
                     </Link>
