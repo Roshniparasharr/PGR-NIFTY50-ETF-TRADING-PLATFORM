@@ -4,13 +4,13 @@ import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
 import './assets/styles/index.css';
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "assets/styles/tailwind.css";
-
+import "assets/styles/index.css";
 // Layouts
 import Admin from "./layouts/Admin";
 import Auth from "./layouts/Auth.js";
+import { Link } from "react-router-dom";
 
 // Views without layouts
-import Landing from "./views/user/Landing.js";
 import Profile from "./views/user/Profile.js";
 import Index from "./views/user/Index.js";
 import AboutHero from "components/User/About/AboutHero.js";
@@ -26,7 +26,6 @@ ReactDOM.render(
       <Route path="/auth" component={Auth} />
 
       {/* Routes without layouts */}
-      <Route path="/landing" exact component={Landing} />
       <Route path="/profile" exact component={Profile} />
       <Route path="/" exact component={Index} />
       <Route path="/about" exact component={AboutHero} />
