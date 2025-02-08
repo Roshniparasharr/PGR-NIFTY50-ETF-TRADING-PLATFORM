@@ -5,6 +5,10 @@ import './assets/styles/index.css';
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "assets/styles/tailwind.css";
 import "assets/styles/index.css";
+<<<<<<< HEAD
+=======
+
+>>>>>>> 3f36b800cdb3c7de52e08f952a8ce8e38da9b7ce
 // Layouts
 import Admin from "./layouts/Admin";
 import Auth from "./layouts/Auth.js";
@@ -31,6 +35,7 @@ ReactDOM.render(
       <Route path="/about" exact component={AboutHero} />
       <Route path="/contact" exact component={ContactPage} />
       <Route path="/services" exact component={ServicesPage} />
+      <Route path="/table" exact component={CardTable} />
 
 
       {/* Route for company details page */}
