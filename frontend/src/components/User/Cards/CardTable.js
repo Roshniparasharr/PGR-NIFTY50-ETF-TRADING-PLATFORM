@@ -1,123 +1,164 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { AgGridReact } from 'ag-grid-react';
-import 'ag-grid-community/styles/ag-grid.css';
-import 'ag-grid-community/styles/ag-theme-alpine.css';
-import css from '../../../assets/styles/table.css';
-const Table = ({ color }) => {
+import { Link } from 'react-router-dom';
+import '../../../assets/styles/table.css';
+
+const Table = () => {
   const [niftyData, setNiftyData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'none' });
 
   useEffect(() => {
-    setLoading(true);
-    axios
-      .get('http://localhost:5000/api/niftydata')
-      .then(response => {
-        console.log("Fetched Data:", response.data);
+    const fetchData = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/niftydata');
+        console.log('Fetched data:', response.data);
         if (response.data && Array.isArray(response.data)) {
           const sortedData = response.data.sort((a, b) => new Date(b.fetchTime) - new Date(a.fetchTime));
           setNiftyData([sortedData[0]]);
         } else {
           setError('Invalid data format received');
         }
-        setLoading(false);
-      })
-      .catch(error => {
+      } catch (error) {
         setError(`Error fetching data: ${error.message}`);
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    fetchData();
   }, []);
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date instanceof Date && !isNaN(date)
-      ? date.toLocaleString('en-GB', {
-          day: '2-digit',
-          month: 'short',
-          year: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: true,
-        })
-      : 'Invalid Date';
-  };
-
-  const columnDefs = [
-    { headerName: "S No.", valueGetter: "node.rowIndex + 1", width: 100 },
-    { headerName: "Company", field: "symbol", sortable: true, filter: true },
-    { headerName: "Open", field: "open", cellClass: "numeric", sortable: true, filter: true },
-    { headerName: "Day High", field: "dayHigh", cellClass: "numeric", sortable: true, filter: true },
-    { headerName: "Day Low", field: "dayLow", cellClass: "numeric", sortable: true, filter: true },
-    { headerName: "Last Price", field: "lastPrice", cellClass: "numeric", sortable: true, filter: true },
-    { headerName: "Previous Close", field: "previousClose", cellClass: "numeric", sortable: true, filter: true },
-    { headerName: "Change", field: "change", cellClass: "numeric change-column", sortable: true, filter: true },
-    { headerName: "Volume", field: "totalTradedVolume", cellClass: "numeric", sortable: true, filter: true },
-    { headerName: "Value", field: "totalTradedValue", cellClass: "numeric", sortable: true, filter: true },
-    { headerName: "Last Update Time", field: "lastUpdateTime", valueFormatter: ({ value }) => formatDate(value), sortable: true, filter: true },
-    { headerName: "Year High", field: "yearHigh", cellClass: "numeric", sortable: true, filter: true },
-    { headerName: "Year Low", field: "yearLow", cellClass: "numeric", sortable: true, filter: true },
-    { headerName: "Per Change 365d", field: "perChange365d", cellClass: "numeric change-column", sortable: true, filter: true },
-    { headerName: "Date 365d Ago", field: "date365dAgo", valueFormatter: ({ value }) => formatDate(value), sortable: true, filter: true },
-    { headerName: "Date 30d Ago", field: "date30dAgo", valueFormatter: ({ value }) => formatDate(value), sortable: true, filter: true },
-    { headerName: "Per Change 30d", field: "perChange30d", cellClass: "numeric change-column", sortable: true, filter: true }
-  ];
-
-  const cellStyle = (params) => {
-    if (params && params.colDef && params.colDef.field) {
-      if (params.colDef.field === "change" || params.colDef.field === "perChange365d" || params.colDef.field === "perChange30d") {
-        return {
-          color: params.value < 0 ? 'red' : 'green',
-          fontWeight: 'bold',
-        };
-      }
+  const requestSort = (key) => {
+    let direction = 'ascending';
+    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+      direction = 'descending';
+    } else if (sortConfig.key === key && sortConfig.direction === 'descending') {
+      direction = 'none';
     }
-    return {};
+    setSortConfig({ key, direction });
   };
+
+  const getSortedData = (data) => {
+    if (sortConfig.direction === 'none') {
+      return data;
+    }
+    return [...data].sort((a, b) => {
+      if (a[sortConfig.key] < b[sortConfig.key]) {
+        return sortConfig.direction === 'ascending' ? -1 : 1;
+      }
+      if (a[sortConfig.key] > b[sortConfig.key]) {
+        return sortConfig.direction === 'ascending' ? 1 : -1;
+      }
+      return 0;
+    });
+  };
+
+  // Fundamental Calculation Functions
+  const calculatePERatio = (lastPrice, earningsPerShare) => {
+    if (!lastPrice || !earningsPerShare) return 'N/A'; // Prevent division by 0 or undefined values
+    return (parseFloat(lastPrice) / parseFloat(earningsPerShare)).toFixed(2);
+  };
+  
+  const calculatePBRatio = (lastPrice, bookValue) => {
+    if (!lastPrice || !bookValue) return 'N/A';
+    return (parseFloat(lastPrice) / parseFloat(bookValue)).toFixed(2);
+  };
+  
+  const calculateDividendYield = (dividend, lastPrice) => {
+    if (!dividend || !lastPrice) return 'N/A';
+    return ((parseFloat(dividend) / parseFloat(lastPrice)) * 100).toFixed(2) + '%';
+  };
+  
+  const calculateROCE = (roce) => roce ? parseFloat(roce).toFixed(2) + '%' : 'N/A';
+  
+  const calculateROE = (roe) => roe ? parseFloat(roe).toFixed(2) + '%' : 'N/A';
+  
+
+  const calculateFundamentals = (row) => {
+    return {
+      peRatio: calculatePERatio(row.lastPrice, row.earningsPerShare),
+      pbRatio: calculatePBRatio(row.lastPrice, row.bookValue),
+      dividendYield: calculateDividendYield(row.dividend, row.lastPrice),
+      eps: row.earningsPerShare ? row.earningsPerShare.toFixed(2) : 'N/A',
+      roce: calculateROCE(row.roce),
+      roe: calculateROE(row.roe),
+    };
+  };
+  
 
   if (loading) {
     return (
-      <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded bg-white">
-        <div className="p-4">Loading...</div>
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
+        <p>Loading data...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded bg-white">
-        <div className="p-4 text-red-500">{error}</div>
+      <div className="error-container">
+        <p className="error-message">{error}</p>
       </div>
     );
   }
 
   return (
-    <div className={'relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded ' + (color === 'light' ? 'bg-white' : 'bg-lightBlue-900 text-white')}>
-      <div className="rounded-t mb-0 px-4 py-4 border-0">
-        <div className="flex flex-wrap items-center justify-between">
-          <div className="flex relative w-full px-4 max-w-full flex-grow flex-1 items-center justify-between">
-            <h3 className={'font-semibold text-lg ' + (color === 'light' ? 'text-blueGray-700' : 'text-white')}>Nifty Data</h3>
+    <div className="table-container">
+      <div className="py-8">
+        <div className="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto">
+          <h3 className="table-header">Nifty Data</h3>
+          <div className="ag-theme-custom">
+            <table className="ag-header">
+              <thead>
+                <tr>
+                  {[
+                    'symbol', 'open', 'dayHigh', 'dayLow', 'previousClose', 'lastPrice', 'change', 'pChange',
+                    'totalTradedVolume', 'totalTradedValue', 'yearHigh', 'yearLow', 'perChange365d', 'perChange30d',
+                    'P/E Ratio', 'P/B Ratio', 'Dividend Yield', 'EPS', 'ROCE', 'ROE'
+                  ].map((column) => (
+                    <th
+                      key={column}
+                      className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer"
+                      onClick={() => requestSort(column)}
+                    >
+                      {column.replace(/([A-Z])/g, ' $1').toUpperCase()}
+                      {sortConfig.key === column && (sortConfig.direction === 'ascending' ? ' ▲' : sortConfig.direction === 'descending' ? ' ▼' : '')}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {niftyData[0]?.stocks && getSortedData(niftyData[0].stocks).map((row, index) => {
+                  console.log('Row Data:', row);
+                  const fundamentals = calculateFundamentals(row);
+                  return (
+                    <tr key={index} className="ag-header-cell">
+                      <td className="ag-row">
+                        <Link to={`/company/${row.symbol}`} className="text-blue-500 hover:text-blue-800">
+                          {row.symbol}
+                        </Link>
+                      </td>
+                      {['open', 'dayHigh', 'dayLow', 'previousClose', 'lastPrice', 'change', 'pChange', 'totalTradedVolume', 'totalTradedValue', 'yearHigh', 'yearLow', 'perChange365d', 'perChange30d'].map((field, index) => (
+                        <td key={index} className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                          {row[field]}
+                        </td>
+                      ))}
+                      <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{fundamentals.peRatio}</td>
+                      <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{fundamentals.pbRatio}</td>
+                      <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{fundamentals.dividendYield}</td>
+                      <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{fundamentals.eps}</td>
+                      <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{fundamentals.roce}</td>
+                      <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">{fundamentals.roe}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         </div>
-      </div>
-
-      <div className={`ag-theme-alpine w-full} style={{ height: '500px', overflowY: 'auto' }`}>
-        {niftyData.length === 0 ? (
-          <div className="p-4">No data available</div>
-        ) : (
-          <AgGridReact
-            columnDefs={columnDefs}
-            rowData={niftyData[0]?.stocks || []}
-            rowModelType="clientSide"
-            domLayout="autoHeight"
-            getRowStyle={cellStyle}
-            pinnedTopRowData={niftyData[0]?.stocks && niftyData[0].stocks.length > 0 ? [niftyData[0].stocks[0]] : []} // Pin the first row
-            suppressHorizontalScroll={true} // Ensure horizontal scroll is suppressed
-            headerHeight={50} // Set header height
-            rowHeight={40} // Set row height
-            className="ag-theme-alpine"
-          />
-        )}
       </div>
     </div>
   );

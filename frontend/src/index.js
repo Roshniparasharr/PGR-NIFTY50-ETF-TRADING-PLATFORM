@@ -4,6 +4,7 @@ import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
 
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "assets/styles/tailwind.css";
+import "assets/styles/index.css";
 
 // Layouts
 import Admin from "./layouts/Admin";
@@ -16,6 +17,7 @@ import Index from "./views/user/Index.js";
 import AboutHero from "components/User/About/AboutHero.js";
 import ContactPage from "components/User/Contact/ContactPage";
 import ServicesPage from "components/User/Service/ServicesPage";
+import CardTable from "components/User/Cards/CardTable";
 
 // Use ReactDOM.render instead of createRoot (since React 17 is likely being used)
 ReactDOM.render(
@@ -32,6 +34,7 @@ ReactDOM.render(
       <Route path="/about" exact component={AboutHero} />
       <Route path="/contact" exact component={ContactPage} />
       <Route path="/services" exact component={ServicesPage} />
+      <Route path="/table" exact component={CardTable} />
 
 
       {/* Redirect for unknown routes */}
