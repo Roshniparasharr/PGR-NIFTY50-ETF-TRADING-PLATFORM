@@ -5,8 +5,8 @@ import StockTable from "../../components/Common/StockTable";
 export default function TablesPage() {
   return (
     <>
-      <div className="flex flex-wrap mt-4">
-        <div className="w-full mb-12 px-4">
+      <div className="flex flex-wrap mt-24">
+        <div className="w-full mb-12 px-4 mt-24">
           <CardTable />
           <StockTable />
         </div>

@@ -4,6 +4,13 @@ import '../../assets/styles/companypage.css';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { ArrowUpCircle, ArrowDownCircle, TrendingUp, BarChart3, Clock, Award, PieChart } from 'lucide-react';
 
+
+import AdminNavbar from "../../components/Admin/Navbars/AdminNavbar.js";
+import Sidebar from "../../components/Admin/Sidebar/Sidebar.js";
+import HeaderStats from "../../components/Admin/Headers/HeaderStats.js";
+import FooterAdmin from "../../components/Admin/Footers/FooterAdmin.js";
+
+
 const CompanyDetailsPage = () => {
   const { symbol } = useParams();
   const [companyData, setCompanyData] = useState(null);
@@ -261,7 +268,7 @@ const CompanyDetailsPage = () => {
           <div className="analysis-container">
             <h3 className="analysis-title">Historical Data</h3>
             <div className="table-container">
-              <div className="py-2">
+              <div >
 <div className="button-container">
   <button onClick={() => filterData("1D")} className="filter-button">1D</button>
   <button onClick={() => filterData("1W")} className="filter-button">1W</button>
@@ -298,7 +305,14 @@ const CompanyDetailsPage = () => {
   };
 
   return (
-    <div className="page-container">
+    <>
+      <Sidebar />
+      <div className="relative md:ml-64 bg-blueGray-100">
+          <AdminNavbar />
+           
+
+        
+    <div className="page-container relative bg-lightBlue-600 md:pt-32 pb-32 pt-12">
       <div className="company-info-card">
         <div className="company-header">
           <h1 className="company-name">{companyData?.name} {symbol}</h1>
@@ -322,7 +336,10 @@ const CompanyDetailsPage = () => {
           {renderTabContent()}
         </div>
       </div>
+       <FooterAdmin />
+              </div>
     </div>
+    </>
   );
 };
 
