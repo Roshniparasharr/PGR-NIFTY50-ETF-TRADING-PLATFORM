@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+  import mongoose from 'mongoose';
 
 const stockSchema = new mongoose.Schema({
   symbol: String,

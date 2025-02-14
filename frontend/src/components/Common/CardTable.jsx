@@ -1,19 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import '../../assets/styles/table.css';
+import { ChevronDown, ChevronRight, Edit, Trash2, PlusCircle, Filter, Check, X } from 'lucide-react';
+import ConfirmationModal from '../../components/Admin/Modals/ConformationModal'; // Adjust the path as needed
+import CardStats from '../../components/Admin/Cards/CardStats'; // Import CardStats component
 
 const CardTable = () => {
   const [niftyData, setNiftyData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'none' });
+  const [expandedRow, setExpandedRow] = useState(null);
+  const [dropdownOpen, setDropdownOpen] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [pendingAction, setPendingAction] = useState(null);
+  const [selectedStock, setSelectedStock] = useState(null);
+  const [userCount, setUserCount] = useState(0); // State for user count
+  const [orgCount, setOrgCount] = useState(0); // State for organization count
 
+  // Fetch Nifty data
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get('http://localhost:5000/api/niftydata');
-        // console.log('Fetched Nifty data:', response.data);
         if (response.data && Array.isArray(response.data)) {
           const sortedData = response.data.sort((a, b) => new Date(b.fetchTime) - new Date(a.fetchTime));
           setNiftyData([sortedData[0]]); // Only using the most recent data
@@ -27,8 +36,40 @@ const CardTable = () => {
         setLoading(false);
       }
     };
-  
+
     fetchData();
+  }, []);
+
+  // Fetch user and organization counts
+  useEffect(() => {
+    const fetchUserCount = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/users');
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+        setUserCount(data.length);
+      } catch (error) {
+        console.error('Error fetching user count:', error);
+      }
+    };
+
+    const fetchOrgCount = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/organizations');
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+        setOrgCount(data.length);
+      } catch (error) {
+        console.error('Error fetching organization count:', error);
+      }
+    };
+
+    fetchUserCount();
+    fetchOrgCount();
   }, []);
 
   const requestSort = (key) => {
@@ -56,11 +97,26 @@ const CardTable = () => {
     });
   };
 
+  const toggleRow = (index) => {
+    setExpandedRow(expandedRow === index ? null : index);
+  };
+
+  const handleActionClick = (stock, action) => {
+    setSelectedStock(stock);
+    setPendingAction(action);
+    setIsModalOpen(true);
+  };
+
   if (loading) {
     return (
-      <div className="loading-container">
-        <div className="loading-spinner"></div>
-        <p>Loading data...</p>
+      <div className="flex items-center justify-center w-full h-64">
+        <div className="flex flex-col items-center gap-4">
+          <div
+            className="border-blue-500 inline-block h-12 w-12 animate-spin rounded-full border-8 border-solid border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
+            role="status"
+          ></div>
+          <p className="text-gray-600 text-sm">Loading data...</p>
+        </div>
       </div>
     );
   }
@@ -74,18 +130,28 @@ const CardTable = () => {
   }
 
   return (
-    <div className="table-container">
-      <div className="py-8">
-        <div className="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto">
-          <h3 className="table-header">Nifty Data</h3>
-          <div className="ag-theme-custom">
-            <table className="ag-header">
-              <thead>
+    <>
+      <div className="">
+        {/* CardStats Section */}
+
+        {/* CardTable Section */}
+        <div className="mx-2 overflow-hidden -mt-20">
+          <div className="rounded bg-gray-100 shadow-md px-6 py-4 flex justify-between items-center border-b">
+            <h2 className="text-xl font-bold text-gray-800 flex items-center">
+              <Filter className="mr-2 text-gray-600" size={20} />
+              Nifty Data
+            </h2>
+          </div>
+
+          {/* Table container with fixed height and scrollbar */}
+          <div className="bg-white shadow-md rounded-lg overflow-x-auto h-[28rem] overflow-y-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b sticky top-0">
                 <tr>
                   {['symbol', 'open', 'dayHigh', 'dayLow', 'previousClose', 'lastPrice', 'change', 'pChange', 'totalTradedVolume', 'totalTradedValue', 'yearHigh', 'yearLow', 'perChange365d', 'perChange30d'].map((column) => (
                     <th
                       key={column}
-                      className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                       onClick={() => requestSort(column)}
                     >
                       {column.replace(/([A-Z])/g, ' $1').toUpperCase()}
@@ -94,27 +160,49 @@ const CardTable = () => {
                   ))}
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-gray-200">
                 {niftyData[0]?.stocks && getSortedData(niftyData[0].stocks).map((row, index) => (
-                  <tr key={index} className="ag-header-cell">
-                    <td className="ag-row">
-                      <Link to={`/company/${row.symbol}`} className="text-blue-500 hover:text-blue-800">
-                        {row.symbol}
-                      </Link>
-                    </td>
-                    {['open', 'dayHigh', 'dayLow', 'previousClose', 'lastPrice', 'change', 'pChange', 'totalTradedVolume', 'totalTradedValue', 'yearHigh', 'yearLow', 'perChange365d', 'perChange30d'].map((field, index) => (
-                      <td key={index} className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                        {row[field]}
+                  <React.Fragment key={index}>
+                    <tr
+                      onClick={() => toggleRow(index)}
+                      className={`cursor-pointer hover:bg-gray-50 transition-colors ${
+                        expandedRow === index ? "bg-gray-50" : ""
+                      }`}
+                    >
+                      <td className="px-6 py-4 flex items-center">
+                        {expandedRow === index ? (
+                          <ChevronDown className="mr-2 text-gray-500" size={16} />
+                        ) : (
+                          <ChevronRight className="mr-2 text-gray-500" size={16} />
+                        )}
+                        <Link to={`/company/${row.symbol}`} className="text-blue-500 hover:text-blue-800">
+                          {row.symbol}
+                        </Link>
                       </td>
-                    ))}
-                  </tr>
+                      {['open', 'dayHigh', 'dayLow', 'previousClose', 'lastPrice', 'change', 'pChange', 'totalTradedVolume', 'totalTradedValue', 'yearHigh', 'yearLow', 'perChange365d', 'perChange30d'].map((field, idx) => (
+                        <td key={idx} className="px-6 py-4">
+                          {row[field]}
+                        </td>
+                      ))}
+                    </tr>
+                  </React.Fragment>
                 ))}
               </tbody>
             </table>
           </div>
         </div>
       </div>
-    </div>
+
+      <ConfirmationModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={() => {
+          // Handle the action here
+          setIsModalOpen(false);
+        }}
+        message={`Are you sure you want to ${pendingAction} this stock?`}
+      />
+    </>
   );
 };
 

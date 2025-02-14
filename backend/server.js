@@ -8,19 +8,17 @@ import authRoutes from './routes/authRoutes.js';
 // import scrapeAndStoreETFData from './scripts/scraper2.js'
 import stockRoute from "./routes/stockRoute.js";
 import { fetchNifty50Data } from './scripts/scraper.js';
-
-// added by abhishek 
+import contactRoutes from "./routes/contactRoutes.js";
+import orgRegisterRoutes from "./routes/orgRegisterRoutes.js";
 import cron from 'node-cron';
 import { scrapeAndStoreETFData } from './controllers/stockController.js';
-
+import organizationRoutes from "./routes/orgRoutes.js";
  // This will fetch and store Nifty data when the server starts
-
+ import userRoutes from "./routes/userRoutes.js";
 dotenv.config();
 const app = express();
 
-
-
-cron.schedule('*/5 * * * * *', async () => {
+cron.schedule('*/1 * * * *', async () => {
   try {
     await scrapeAndStoreETFData();
     console.log('ETF data scraped and saved successfully');
@@ -29,6 +27,7 @@ cron.schedule('*/5 * * * * *', async () => {
   }
 });
 
+
 connectDB();
 
 app.use(cors());
@@ -36,6 +35,11 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use('/api/nifty', niftyRoute);
 app.use('/api/data', stockRoute);
+app.use("/api/contacts", contactRoutes);
+app.use("/api/organizations", organizationRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/orgRegister", orgRegisterRoutes);
+// organizations routes
 
 
 // API endpoint to get Nifty data from MongoDB
