@@ -3,25 +3,26 @@ import User from "../models/User.js";
 // Get all users
 export const getUsers = async (req, res) => {
   try {
-    const users = await User.find({});
+    const users = await User.find({ status: true }); // Fetch only active users
     res.json(users);
   } catch (error) {
     res.status(500).json({ message: "Server Error" });
   }
 };
 
+
 // Get user by ID
 export const getUserById = async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id);
-    if (user) {
-      res.json(user);
-    } else {
-      res.status(404).json({ message: "User not found" });
-    }
-  } catch (error) {
-    res.status(500).json({ message: "Server Error" });
-  }
+  // try {
+  //   const user = await User.findById(req.params.id);
+  //   if (user) {
+  //     res.json(user);
+  //   } else {
+  //     res.status(404).json({ message: "User not found" });
+  //   }
+  // } catch (error) {
+  //   res.status(500).json({ message: "Server Error" });
+  // }
 };
 
 // Delete user
@@ -29,8 +30,9 @@ export const deleteUser = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (user) {
-      await user.deleteOne();
-      res.json({ message: "User removed" });
+      user.status = false;
+      await user.save();
+      res.json({ message: "User removed successfully (soft delete)" });
     } else {
       res.status(404).json({ message: "User not found" });
     }
@@ -38,6 +40,7 @@ export const deleteUser = async (req, res) => {
     res.status(500).json({ message: "Error deleting user" });
   }
 };
+
 
 // Update user
 export const updateUser = async (req, res) => {

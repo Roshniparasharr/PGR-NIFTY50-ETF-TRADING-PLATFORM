@@ -5,7 +5,7 @@ import NiftyData from './models/NiftyData.js';
 import niftyRoute from './routes/adminRoute.js';  // Ensure this file exists
 import connectDB from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
-// import scrapeAndStoreETFData from './scripts/scraper2.js'
+import studentRoutes from "./routes/OrgStudentsRoutes.js";
 import stockRoute from "./routes/stockRoute.js";
 import { fetchNifty50Data } from './scripts/scraper.js';
 import contactRoutes from "./routes/contactRoutes.js";
@@ -39,6 +39,7 @@ app.use("/api/contacts", contactRoutes);
 app.use("/api/organizations", organizationRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/orgRegister", orgRegisterRoutes);
+app.use("/students", studentRoutes);
 // organizations routes
 
 

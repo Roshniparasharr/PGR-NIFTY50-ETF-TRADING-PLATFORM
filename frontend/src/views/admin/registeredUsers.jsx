@@ -2,16 +2,21 @@ import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { ChevronDown, ChevronRight, Trash2, Filter, PlusCircle, Edit } from "lucide-react";
 import CardStats from "../../components/Admin/Cards/CardStats";
-import RegisterForm from "../auth/Register"; // Import the RegisterForm modal
+import RegistrationForm from "../auth/Register"; // Import the updated RegistrationForm
+import ConfirmationModal from "../../components/Admin/Modals/ConformationModal";
 
-const RegisterUserList = ({ onRegisterClick }) => {
+const RegisterUserList = () => {
   const [contacts, setContacts] = useState([]);
   const [orgCount, setOrgCount] = useState(0);
   const [expandedRow, setExpandedRow] = useState(null);
   const [refresh, setRefresh] = useState(false);
   const [users, setUsers] = useState([]);
   const [filter, setFilter] = useState("all");
-  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false); // State to control modal visibility
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(null); // State to hold the selected user for editing
 
   useEffect(() => {
     fetchContacts();
@@ -38,23 +43,24 @@ const RegisterUserList = ({ onRegisterClick }) => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this user?")) return;
-    try {
-      await axios.delete(`http://localhost:5000/api/users/${id}`);
-      setRefresh((prev) => !prev);
-    } catch (error) {
-      console.error("Error deleting user:", error);
-      alert("Failed to delete user. Please try again.");
-    }
-  };
-
   const fetchUsers = async () => {
     try {
       const response = await axios.get("http://localhost:5000/api/users");
       setUsers(response.data);
     } catch (error) {
       console.error("Error fetching users:", error);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`http://localhost:5000/api/users/${id}`);
+      setRefresh((prev) => !prev);
+      setIsDeleteModalOpen(false);
+      setIsSuccessModalOpen(true); // Show success modal after deletion
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      alert("Failed to delete user. Please try again.");
     }
   };
 
@@ -82,14 +88,32 @@ const RegisterUserList = ({ onRegisterClick }) => {
 
   const userCount = contacts.length;
 
-  // Function to open the register modal
   const openRegisterModal = () => {
+    setSelectedUser(null); // Reset selected user for new registration
     setIsRegisterModalOpen(true);
   };
 
-  // Function to close the register modal
   const closeRegisterModal = () => {
     setIsRegisterModalOpen(false);
+    setSelectedUser(null); // Reset selected user when modal closes
+  };
+
+  const openDeleteModal = (id) => {
+    setSelectedUserId(id);
+    setIsDeleteModalOpen(true);
+  };
+
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+  };
+
+  const closeSuccessModal = () => {
+    setIsSuccessModalOpen(false);
+  };
+
+  const handleEditClick = (user) => {
+    setSelectedUser(user); // Set the selected user for editing
+    setIsRegisterModalOpen(true); // Open the registration modal
   };
 
   return (
@@ -133,7 +157,7 @@ const RegisterUserList = ({ onRegisterClick }) => {
           </h2>
           <div className="flex space-x-4">
             <button
-              onClick={openRegisterModal} // Open the register modal
+              onClick={openRegisterModal}
               className="flex items-center bg-lightBlue-600 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
             >
               <PlusCircle className="mr-2" size={16} />
@@ -156,7 +180,7 @@ const RegisterUserList = ({ onRegisterClick }) => {
           <table className="w-full">
             <thead className="bg-gray-50 border-b">
               <tr>
-                {["Name", "Email", "Mobile", "Role", "Join Date", "Status", "Actions"].map((header) => (
+                {["Name", "Email", "Mobile", "Join Date", "Actions"].map((header) => (
                   <th
                     key={header}
                     className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -185,38 +209,37 @@ const RegisterUserList = ({ onRegisterClick }) => {
                     </td>
                     <td className="px-6 py-4">{user.email}</td>
                     <td className="px-6 py-4">{user.mobile}</td>
-                    <td className="px-6 py-4">{user.role}</td>
                     <td className="px-6 py-4">
-                      {new Date(user.joinDate).toLocaleDateString()}
+                      {new Date(user.createdDate).toLocaleDateString()}
                     </td>
-                    <td className="px-6 py-4">
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(
-                          user.status
-                        )}`}
-                      >
-                        {user.status}
-                      </span>
-                    </td>
+
                     <td className="px-6 py-4 flex space-x-4 relative">
+                      {/* Edit Button with Tooltip */}
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          onRegisterClick(user);
+                          handleEditClick(user); // Open modal for editing
                         }}
-                        className="text-yellow-500 mx-2 hover:text-yellow-600 transition-colors"
+                        className="text-yellow-500 mx-2 hover:text-yellow-600 transition-colors relative group"
                       >
                         <Edit size={24} />
+                        <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-700 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                          Edit
+                        </span>
                       </button>
 
+                      {/* Delete Button with Tooltip */}
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleDelete(user._id);
+                          openDeleteModal(user._id);
                         }}
-                        className="text-red-500 mx-2 hover:text-red-600 transition-colors"
+                        className="text-red-500 mx-2 hover:text-red-600 transition-colors relative group"
                       >
                         <Trash2 size={24} />
+                        <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-700 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                          Delete
+                        </span>
                       </button>
                     </td>
                   </tr>
@@ -249,8 +272,28 @@ const RegisterUserList = ({ onRegisterClick }) => {
         </div>
       </div>
 
-      {/* Register Modal */}
-      <RegisterForm isOpen={isRegisterModalOpen} onClose={closeRegisterModal} />
+      {/* Register/Edit Modal */}
+      <RegistrationForm
+        isOpen={isRegisterModalOpen}
+        onClose={closeRegisterModal}
+        initialValues={selectedUser} // Pass selected user data for editing
+      />
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={closeDeleteModal}
+        onConfirm={() => handleDelete(selectedUserId)}
+        message="Are you sure you want to delete this user?"
+      />
+
+      {/* Success Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={isSuccessModalOpen}
+        onClose={closeSuccessModal}
+        onConfirm={closeSuccessModal}
+        message="User deleted successfully!"
+      />
     </div>
   );
 };

@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-const OrganizationRegistrationForm = ({ isOpen, onClose }) => {
+const OrganizationRegistrationForm = ({ isOpen, onClose, selectedOrg }) => {
   const [formData, setFormData] = useState({
     id: "",
     name: "",
@@ -13,18 +13,41 @@ const OrganizationRegistrationForm = ({ isOpen, onClose }) => {
     status: true,
     createdBy: "",
   });
-  const [selectedOrg, setSelectedOrg] = useState(null);
-  const [isFormOpen, setIsFormOpen] = useState(false);
 
-  const handleRegisterClick = (org) => {
-    setSelectedOrg(org || null); // If editing, pass the org; else, start fresh
-    setIsFormOpen(true);
-  };
+  // Debug: Log selectedOrg to verify it's being passed correctly
+  useEffect(() => {
+    console.log("Selected Org:", selectedOrg);
+  }, [selectedOrg]);
 
-  const handleCloseForm = () => {
-    setIsFormOpen(false);
-    setSelectedOrg(null);
-  };
+  // Pre-fill form data when selectedOrg changes
+  useEffect(() => {
+    if (selectedOrg) {
+      setFormData({
+        id: selectedOrg._id || "",
+        name: selectedOrg.name || "",
+        address: selectedOrg.address || "",
+        website: selectedOrg.website || "",
+        contactPerson: selectedOrg.contactPerson || "",
+        email: selectedOrg.email || "",
+        mobile: selectedOrg.mobile || "",
+        status: selectedOrg.status || true,
+        createdBy: selectedOrg.createdBy || "",
+      });
+    } else {
+      // Reset form data if no selectedOrg (for new registration)
+      setFormData({
+        id: "",
+        name: "",
+        address: "",
+        website: "",
+        contactPerson: "",
+        email: "",
+        mobile: "",
+        status: true,
+        createdBy: "",
+      });
+    }
+  }, [selectedOrg]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -34,13 +57,25 @@ const OrganizationRegistrationForm = ({ isOpen, onClose }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:5000/api/organizations", formData);
-      alert("Organization registered successfully!");
+      const url = selectedOrg
+        ? `http://localhost:5000/api/organizations/${selectedOrg._id}`
+        : "http://localhost:5000/api/organizations";
+      const method = selectedOrg ? "put" : "post";
+      const response = await axios[method](url, formData);
+      alert(
+        selectedOrg
+          ? "Organization updated successfully!"
+          : "Organization registered successfully!"
+      );
       console.log(response.data);
       onClose(); // Close the modal after successful submission
     } catch (error) {
-      console.error("Error registering organization:", error);
-      alert("Failed to register organization.");
+      console.error("Error:", error);
+      alert(
+        selectedOrg
+          ? "Failed to update organization."
+          : "Failed to register organization."
+      );
     }
   };
 
@@ -62,7 +97,9 @@ const OrganizationRegistrationForm = ({ isOpen, onClose }) => {
             <div className="w-10 h-10 bg-lightBlue-600 rounded-xl flex items-center justify-center shadow-lg">
               <i className="fas fa-building text-white"></i>
             </div>
-            <h2 className="text-2xl font-semibold text-gray-800">Register New Organization</h2>
+            <h2 className="text-2xl font-semibold text-gray-800">
+              {selectedOrg ? "Edit Organization" : "Register New Organization"}
+            </h2>
           </div>
           <button
             onClick={onClose}
@@ -203,7 +240,7 @@ const OrganizationRegistrationForm = ({ isOpen, onClose }) => {
                 type="submit"
                 className="px-6 py-3 rounded-xl bg-lightBlue-600 text-white hover:from-blue-600 hover:to-indigo-700 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200"
               >
-                Register Organization
+                {selectedOrg ? "Update Organization" : "Register Organization"}
               </button>
             </div>
           </form>
